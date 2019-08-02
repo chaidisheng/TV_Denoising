@@ -1,4 +1,5 @@
 #coding:utf-8
+#cython:language_level=2
 import tensorflow as tf
 
 BATCH_SIZE = 1
@@ -38,10 +39,11 @@ def rot_180(tensor):
 def Gauss_Seidel(V, Y, Z, U, RHO):
 	with tf.Session() as sess:
 		v, y, z, u, rho = sess.run([V, Y, Z, U, RHO])
+		coeff_1 = rho / (1.0 + 4.0*rho)
+		coeff_2 = 1.0 / (1.0 + 4.0*rho)
+
 		for i in range(1, v.shape[1]-1): 
 			for j in range(1, v.shape[2]-1):
-				coeff_1 = rho / (1.0 + 4.0*rho)
-				coeff_2 = 1.0 / (1.0 + 4.0*rho)
 
 				v[:,i,j,:] = coeff_1*(v[:,i+1,j,:] + v[:,i-1,j,:] + v[:,i,j+1,:] + v[:,i,j-1,:] + 
 				z[:,i-1,j,0:1] - z[:,i,j,0:1] + z[:,i,j-1,1:2] - z[:,i,j,1:2] + 
@@ -50,8 +52,8 @@ def Gauss_Seidel(V, Y, Z, U, RHO):
 	return tf.convert_to_tensor(v)
 
 def XN(v, y, z, u, rho):
-	s = Gauss_Seidel(v, y, z, u, rho)
-	return s
+	rec_v = Gauss_Seidel(v, y, z, u, rho)
+	return rec_v
 
 def CN(x, w):
 	return tf.nn.conv2d(x, w, strides=[1, 1, 1, 1], padding='SAME')
@@ -65,8 +67,6 @@ def MN(Dx, z, u):
 	return u
 
 def forward(x, regularizer):
-	x = tf.convert_to_tensor(x)
-	print x
 	Dn = tf.reshape(tf.constant([[0 ,0, 0], [0, -1, 1], [0, 0, 0]], dtype=tf.float32), (3, 3, 1))
 	Dv = tf.reshape(tf.constant([[0 ,0, 0], [0, -1, 0], [0, 1, 0]], dtype=tf.float32), (3 ,3, 1))
 	D = tf.stack([Dn, Dv], axis=3)

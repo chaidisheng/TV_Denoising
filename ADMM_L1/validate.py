@@ -1,5 +1,5 @@
 #coding:utf-8
-
+#cython:language_level=2
 import forward
 import numpy as np
 import pandas as pd
@@ -37,6 +37,7 @@ def validate():
 				forward.IMAGE_SIZE_W,
 				forward.NUM_CHANNELS))
 
+			reshaped_img = tf.convert_to_tensor(reshaped_img)
 			img_out = forward.forward(reshaped_img, None)
 			img_out = np.clip(sess.run(img_out).reshape(img_clean.shape), 0, 1)
 
