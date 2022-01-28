@@ -1,6 +1,4 @@
-==============================
-Total Variation Denoising
-==============================
+# Total Variation Denoising
 ## ADMM(Alternating Direction Method of Multipliers)
 ### Linear ADMM
 ### ADMM with Gauss Seidel
